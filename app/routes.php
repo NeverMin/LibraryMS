@@ -67,6 +67,9 @@ Route::group(array('before' => 'guest'), function() {
 // Main books Controlller left public so that it could be used without logging in too
 Route::resource('/books', 'BooksController');
 
+// Main Categories Controlller resource
+Route::resource('/show-categories', 'CategoriesController');
+
 // Authenticated group 
 Route::group(array('before' => 'auth'), function() {
 
@@ -76,6 +79,19 @@ Route::group(array('before' => 'auth'), function() {
 		'uses'	=> 'HomeController@home'
 	));	
 
+    // Render Add Book Category panel
+    Route::get('/add-category', array(
+        'as' => 'add-category',
+        'uses' => 'CategoriesController@renderAddCategories'
+    ));
+
+    // Render All Books Categories panel
+    Route::get('/all-categories', array(
+        'as' => 'all-categories',
+        'uses' => 'CategoriesController@renderAllCategories'
+    ));   
+    
+    
 	// Render Add Books panel
     Route::get('/add-books', array(
         'as' => 'add-books',

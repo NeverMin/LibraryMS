@@ -1,29 +1,23 @@
 function loadResults(){
-
     var url = config.path.ajax 
-            + "/books?category_id=" + $('#category_fill').val();
+            + "/show-categories";
 
-    // By default show all Books, if a category is null or not selected from the dropdown
+    var table = $('#allcategories-table');
 
-    if($('#category_fill').val() == "" || $('#category_fill').val() == null)
-    {        
-        url = config.path.ajax+"/books";
-    }
+    var default_tpl = _.template($('#allcategories_show').html());
 
-
-    var table = $('#all-books');
-    
-    var default_tpl = _.template($('#allbooks_show').html());
 
     $.ajax({
         url : url,
         success : function(data){
             if($.isEmptyObject(data)){
-                table.html('<tr><td colspan="99">No Books in this category</td></tr>');
+                table.html('<tr><td colspan="99">No Categories found.</td></tr>');
             } else {
                 table.html('');
-                for (var book in data) {
-                    table.append(default_tpl(data[book]));
+                // console.log(JSON.stringify(data));
+                
+                for(var category_list in data){
+                    table.append(default_tpl(data[category_list]));
                 }
             }
         },
@@ -36,13 +30,13 @@ function loadResults(){
     });
 }
 
+
+
 $(document).ready(function(){
 
-    $("#category_fill").change(function(){
-        loadResults();
-    });
 
-    $(document).on("click","#addbooks",function(){
+    $(document).on("click","#addcategory",function(){
+
 
         var form = $(this).parents('form'),
             module_body = $(this).parents('.module-body'),
@@ -52,14 +46,10 @@ $(document).ready(function(){
                 return form.find(selector);
             };
 
-        sendJSON.title = f$('input[data-form-field~=title]').val();
-        sendJSON.author = f$('input[data-form-field~=author]').val();
-        sendJSON.description = f$('textarea[data-form-field~=description]').val();
-        sendJSON.category = f$('select[data-form-field~=category]').val();
-        sendJSON.number = parseInt(f$('input[data-form-field~=number]').val());
+        sendJSON.category = f$('input[data-form-field~=category]').val();
 
-        if(sendJSON.title == "" || sendJSON.author == "" || sendJSON.description == "" || sendJSON.number == null){
-            module_body.prepend(templates.alert_box( {type: 'danger', message: 'Book Details Not Complete'} ));
+        if(sendJSON.category == ""){
+            module_body.prepend(templates.alert_box( {type: 'danger', message: 'Category is missing.'} ));
             send_flag = false;
         }
         
@@ -68,9 +58,10 @@ $(document).ready(function(){
             $.ajax({
                 type : 'POST',
                 data : {
-                    add_book_data : JSON.stringify(sendJSON)
+                    add_category_data : JSON.stringify(sendJSON)
                 },
-                url : config.path.ajax + '/books',
+                url : config.path.ajax + 'show-categories',
+                
                 success: function(data) {                    
                     module_body.prepend(templates.alert_box( {type: 'success', message: data} ));
                 },
